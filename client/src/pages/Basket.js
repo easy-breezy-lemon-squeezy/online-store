@@ -1,11 +1,11 @@
-import React from 'react';
+import React from 'react'
 
 const Basket = () => {
-    return (
-        <div>
-            basket
-        </div>
-    );
-};
+	return (
+		<div className='d-flex align-items-center justify-content-center mt-5'>
+			<div>Корзина пуста</div>
+		</div>
+	)
+}
 
-export default Basket;
+export default Basket

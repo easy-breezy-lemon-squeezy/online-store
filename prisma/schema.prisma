@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model basket_devices {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+  basketId  Int?
+  deviceId  Int?
+  baskets   baskets? @relation(fields: [basketId], references: [id])
+  devices   devices? @relation(fields: [deviceId], references: [id])
+}
+
+model baskets {
+  id             Int              @id @default(autoincrement())
+  createdAt      DateTime         @db.Timestamptz(6)
+  updatedAt      DateTime         @db.Timestamptz(6)
+  userId         Int?
+  users          users?           @relation(fields: [userId], references: [id])
+  basket_devices basket_devices[]
+}
+
+model brands {
+  id          Int           @id @default(autoincrement())
+  name        String        @unique @db.VarChar(255)
+  createdAt   DateTime      @db.Timestamptz(6)
+  updatedAt   DateTime      @db.Timestamptz(6)
+  devices     devices[]
+  type_brands type_brands[]
+}
+
+model device_infos {
+  id          Int      @id @default(autoincrement())
+  title       String   @db.VarChar(255)
+  description String   @db.VarChar(255)
+  createdAt   DateTime @db.Timestamptz(6)
+  updatedAt   DateTime @db.Timestamptz(6)
+  deviceId    Int?
+  devices     devices? @relation(fields: [deviceId], references: [id])
+}
+
+model devices {
+  id             Int              @id @default(autoincrement())
+  name           String           @unique @db.VarChar(255)
+  price          Int
+  rating         Int?             @default(0)
+  img            String           @db.VarChar(255)
+  createdAt      DateTime         @db.Timestamptz(6)
+  updatedAt      DateTime         @db.Timestamptz(6)
+  typeId         Int?
+  brandId        Int?
+  brands         brands?          @relation(fields: [brandId], references: [id])
+  types          types?           @relation(fields: [typeId], references: [id])
+  basket_devices basket_devices[]
+  device_infos   device_infos[]
+  ratings        ratings[]
+}
+
+model ratings {
+  id        Int      @id @default(autoincrement())
+  rate      Int
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+  userId    Int?
+  deviceId  Int?
+  devices   devices? @relation(fields: [deviceId], references: [id])
+  users     users?   @relation(fields: [userId], references: [id])
+}
+
+model type_brands {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @db.Timestamptz(6)
+  updatedAt DateTime @db.Timestamptz(6)
+  typeId    Int?
+  brandId   Int?
+  brands    brands?  @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  types     types?   @relation(fields: [typeId], references: [id], onDelete: Cascade)
+
+  @@unique([typeId, brandId])
+}
+
+model types {
+  id          Int           @id @default(autoincrement())
+  name        String        @unique @db.VarChar(255)
+  createdAt   DateTime      @db.Timestamptz(6)
+  updatedAt   DateTime      @db.Timestamptz(6)
+  devices     devices[]
+  type_brands type_brands[]
+}
+
+model users {
+  id        Int       @id @default(autoincrement())
+  email     String?   @unique @db.VarChar(255)
+  password  String?   @db.VarChar(255)
+  role      String?   @default("USER") @db.VarChar(255)
+  createdAt DateTime  @db.Timestamptz(6)
+  updatedAt DateTime  @db.Timestamptz(6)
+  baskets   baskets[]
+  ratings   ratings[]
+}
